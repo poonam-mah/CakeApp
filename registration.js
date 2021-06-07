@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { StyleSheet, Alert, Text, View, TextInput, ScrollView, TouchableOpacity} from 'react-native';
 import firebase from 'firebase';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 export default function Form() {
     
@@ -40,33 +41,13 @@ export default function Form() {
         Password:0, 
         Confirm:0
     })
-
-    function reset() {
-        setUser({
-            Name:'',
-            Email:'',
-            Phone:'',
-            CompanyName:'',
-            Address1:'',
-            Address2:'',
-            Pincode:'',
-            Landmark:'', 
-            Password:'',
-            Confirm:''
-        })
-        setDisable({
-            Name:false,
-            Email:false,
-            Phone:false,
-            CompanyName:false,
-            Address1:false,
-            Address2:false,
-            Pincode:false,
-            Landmark:false, 
-            Password:false,
-            Confirm:false
-        })
-    }
+    const [icon, setIcon] = useState("eye-slash")
+    const [hidePassword, setHidePassword] = useState(true)
+    const changeIcon = () => {
+          icon !== "eye-slash"
+            ? (setIcon("eye-slash"), setHidePassword(true))
+            : (setIcon("eye"), setHidePassword(false))
+        }
 
     function getEmails() {
        const db = firebase.database().ref();
@@ -82,9 +63,8 @@ export default function Form() {
             console.log(error)
           })
           }
-
-
-        } else {
+          } 
+        else {
             console.log("Data Not available");
           }
         }).catch((error) => {
@@ -109,9 +89,8 @@ export default function Form() {
             console.log(error)
           })
           }
-            
-     
-        } else {
+        } 
+        else {
           console.log("Data Not available");
         }
         }).catch((error) => {
@@ -131,7 +110,7 @@ export default function Form() {
             <View style={styles.header}>
                 <Text style={{textAlign:'center',fontSize:27, fontWeight:'bold'}}>CAKE POP RUSH</Text>
             </View> 
-            <ScrollView keyboardShouldPersistTaps='handled'>
+            <ScrollView>
                 <View style={{paddingBottom:25}}>
                     <Text style={{textAlign:'center',fontSize:18,marginTop:10}}>Sign Up and Enjoy all features of CAKEPOPRUSH</Text>
                     <Text style={styles.title}>Name:(First Name and Last Name)</Text>
@@ -362,11 +341,14 @@ export default function Form() {
                             }
                         }}
                     />
-                    
+                    <View style={{flexDirection:'row'}}>
                     <Text style={styles.title}>Password:</Text>
+                    <Icon style={{marginTop:14}} name={icon} size={20} onPress={()=>changeIcon()}/>
+                    </View>
+                      
                     <Text style={styles.error}>{(disable.Password) && 'Password must contain atleast one uppercase letter, one lowercase letter, one number and one special character.'}</Text>
                     <TextInput style={styles.field} 
-                        secureTextEntry={true}
+                        secureTextEntry={hidePassword}
                         placeholder={'Minimum 8 characters'} 
                         onChangeText={(text) => {
                             setUser({
@@ -389,28 +371,12 @@ export default function Form() {
                             }
                         }}
                     />
-                    <Text style={styles.title}>Confirm Password:</Text> 
-                    <Text style={styles.error}>{(disable.Confirm)? 'Password does not match, Please Try Again!':null}</Text>
-                    <TextInput style={styles.field} 
-                        secureTextEntry={true}
-                        placeholder={'Confirm your Password'}
-                        onChangeText={(text) => {
-                            setUser({
-                                ...user,
-                                Confirm:text
-                            });
-                        }} 
-                    />
+                    
                 </View>
                 <View style={{alignItems:'center',flexDirection:'row', justifyContent:'space-around'}}>
                     <TouchableOpacity style={styles.button}  
                         onPress={(e)=>{
-                            if(user.Confirm!=user.Password){
-                                setDisable({
-                                    ...disable,
-                                    Confirm:true
-                                })
-                            }
+                            
                             if(disable.Name==false && disable.Email==false && disable.Phone==false && disable.Address1==false && disable.Address2==false &&  disable.Pincode==false && disable.Password==false && disable.Confirm==false)
                             {
 
@@ -432,7 +398,6 @@ export default function Form() {
                      
                                         else{
                                             firebase.database().ref('customers/').push(user); 
-                                            reset();
                                             Alert.alert("Sign Up Sucessful","Please login in to your account",[
                                             { text: "OK", onPress: () => {console.log("OK Pressed"); }}
                                             ])
@@ -449,10 +414,10 @@ export default function Form() {
                        }}
                           
                     >
-                        <Text style={{fontSize:20,fontWeight:'bold'}} >Sign Up</Text>
+                        <Text style={{fontSize:20,fontWeight:'bold', color:'white'}} >Sign Up</Text>
                     </TouchableOpacity>
-                        <TouchableOpacity style={styles.button} onPress={(e)=> console.log(Phone) }> 
-                        <Text style={{fontSize:20,fontWeight:'bold'}}>Cancel</Text> 
+                        <TouchableOpacity style={styles.button}> 
+                        <Text style={{fontSize:20,fontWeight:'bold',color:'white'}}>Cancel</Text> 
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -466,12 +431,11 @@ const styles = StyleSheet.create({
         flex:1,
         alignItems:"center",
         justifyContent: 'center',
-        backgroundColor:"grey"
+        backgroundColor:'lightgrey',
     },
     header: {  
       backgroundColor:"pink",
       width:"100%",
-      align:"center",
       padding:10,
     },
     title: {
@@ -483,13 +447,15 @@ const styles = StyleSheet.create({
     },
     field: {
       borderWidth:2,
-      marginLeft:10,
+      marginLeft:4,
       marginRight:10,
-      borderColor:"white" ,
-      height:30,
+      borderColor:"black" ,
+      height:40,
       fontSize:15,
-      padding:10,
-      borderRadius: 5,
+      padding:5,
+      paddingVertical:5,
+      borderRadius: 10,
+      marginVertical:-10,
       backgroundColor:"white"
     },
     error: {
@@ -498,7 +464,7 @@ const styles = StyleSheet.create({
         marginLeft:20,
     },
     button: {
-        backgroundColor: 'pink',
+        backgroundColor: 'black',
         alignItems:'center',
         width: 170,
         borderRadius:5,
